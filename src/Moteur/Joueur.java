@@ -11,7 +11,9 @@ import java.util.Scanner;
 
 public class Joueur {
 
-	
+	/*
+	 * (non-javadoc)
+	 */
 	
 	protected int nbCartes;
 
@@ -99,48 +101,38 @@ public class Joueur {
 			faceVisible.add(list.get(i));
 		}
 	}
-	public boolean poserCarte(ArrayList<Carte> carteaposer) { 
+	public boolean poserCarte(ArrayList<Carte> carteaposer, ArrayList<Carte> main) { 
 		 boolean cartejouable=carteaposer.get(0).determinerCarteJouable();
 		 
-		 if (cartejouable){
-			 Carte element=null;
-			 if (carteaposer.get(0) instanceof CarteSpeciale){
-				 ListIterator<Carte> it = carteaposer.listIterator();
-				 while (it.hasNext()){
-					 element= it.next();
-					 System.out.println(element);
-					 //System.out.println(element.getCouleur()+ " "+element.getValeur());
-					 Partie.partie.getTasDeCarte().getTalon().add(element);
-					 //System.out.println(Partie.partie.getTasDeCarte().getTalon().get(0));
-					 main.remove(element);
-					 ((CarteSpeciale) element).jouerEffet();
-					 if(main.size()<3){
-						 piocher(1);
-					 }
-					 
-					 
-					 
-			 }
-				 
-			 }
-				 else{
-					 ListIterator<Carte> it = carteaposer.listIterator();
-					 while (it.hasNext()){
-						 element= it.next();
-						System.out.println(element+" posée");
-						 //System.out.println(element.getCouleur()+ " "+element.getValeur());
-						 Partie.partie.getTasDeCarte().getTalon().add(element);
-						 //System.out.println(Partie.partie.getTasDeCarte().getTalon().get(0));
-						 main.remove(element);
-						 if(main.size()<3){
-							 piocher(1);
-						 }
-					 }
-					 
-			 
-			 
-				 }
-			 
+		if (cartejouable) {
+			Carte element = null;
+			if (carteaposer.get(0) instanceof CarteSpeciale) {
+				ListIterator<Carte> it = carteaposer.listIterator();
+				while (it.hasNext()) {
+					element = it.next();
+					System.out.println(element);
+					Partie.partie.getTasDeCarte().getTalon().add(element);
+					main.remove(element);
+					((CarteSpeciale) element).jouerEffet();
+					if (main.size() < 3) {
+						piocher(1);
+					}
+				}
+
+			}
+			else {
+				ListIterator<Carte> it = carteaposer.listIterator();
+				while (it.hasNext()) {
+					element = it.next();
+					System.out.println(element + " posée");
+					Partie.partie.getTasDeCarte().getTalon().add(element);
+					main.remove(element);
+					if (main.size() < 3) {
+						piocher(1);
+					}
+				}
+
+			}
 			 element.resetEffet();
 			 
 		 }
@@ -155,7 +147,9 @@ public class Joueur {
 		return nbCartes;
 	}
 
-	
+	public String getNom(Joueur j){
+		return j.nomJoueur;
+	}
 	public void setNbCartes(int nbCartes) {
 		this.nbCartes = nbCartes;
 	}
@@ -212,51 +206,53 @@ public class Joueur {
 			
 		
 		
-			boolean carteposee=false;
-			while(!(carteposee)){
-			System.out.println("\n \n quelle carte voulez vous poser parmi : ");
-			System.out.println("\n main :");
-			int i;
-			System.out.println(main);
-			for (i=0;i<main.size();i++){
-				System.out.println("numero "+ (i+1) +" "+ main.get(i));
-			//System.out.println("numero "+ (i+1) +" "+ main.get(i).getCouleur() + " " + main.get(i).getValeur());
+				boolean carteposee = false;
+				while (!(carteposee)) {
+					System.out
+							.println("\n \n quelle carte voulez vous poser parmi : ");
+					System.out.println("\n main :");
+					int i;
+					System.out.println(main);
+					for (i = 0; i < main.size(); i++) {
+						System.out.println("numero " + (i + 1) + " "
+								+ main.get(i));
+					}
+					Scanner sc = new Scanner(System.in);
+					System.out.println("\n combien de cartes à poser ?");
+					int nombrecarteaposer = sc.nextInt();
+					carteaposer = new ArrayList<Carte>();
+					if (nombrecarteaposer == 0) {
+						Partie.partie.getTasDeCarte().donnerTalon(this);
+					} else {
+						for (i = 0; i < nombrecarteaposer; i++) {
+							System.out.println("numéro de la carte n° "
+									+ (i + 1) + " :");
+
+							int numerocarte = sc.nextInt();
+							carteaposer.add(main.get(numerocarte - 1));
+						}
+						boolean identique = false;
+						if (carteaposer.size() == 1) {
+							identique = true;
+						}
+						if (carteaposer.size() > 1) {
+							identique = verifierCarteIdentique(carteaposer);
+						}
+						if (!(identique)) {
+							System.out
+									.println("\n cartes non identiques, veuillez recommencer");
+						}
+						// ->exception identique=false
+						if (identique) {
+							carteposee = poserCarte(carteaposer, main);
+						}
+
+					}
+				}
 			}
-			Scanner sc = new Scanner(System.in);
-			System.out.println("\n combien de cartes à poser ?");
-			int nombrecarteaposer=sc.nextInt();
-			carteaposer = new ArrayList<Carte>();
-			if (nombrecarteaposer==0){
-				Partie.partie.getTasDeCarte().donnerTalon(this);
-			}
-			else {
-			for(i=0;i<nombrecarteaposer;i++){
-			System.out.println("numéro de la carte n° "+(i+1)+" :");
-			
-			int numerocarte = sc.nextInt();
-			carteaposer.add(main.get(numerocarte-1));
-			}
-			boolean identique=false;
-			if(carteaposer.size()==1){
-				identique=true;
-			}
-			//System.out.println(carteaposer.size());
-			if(carteaposer.size()>1){
-			identique=verifierCarteIdentique(carteaposer);
-			}
-			if (!(identique)){
-			 System.out.println("\n cartes non identiques, veuillez recommencer");
-			}
-			//->exception identique=false
-			if (identique){
-				carteposee = poserCarte(carteaposer);	
-			}
-			
-			}}}}
-		
-			
-		
-			}
+		}
+
+	}
 		
 		
 		public void SortieJoueur(){
@@ -288,14 +284,84 @@ public class Joueur {
 		return("Joueur "+nomJoueur+" ");
 	}
 	
-	public String getNomJoueur(){
-		return(nomJoueur);
-	}
-	public String getNom(Joueur joueur){
-		return(joueur.getNomJoueur());
-	}
+	
+
 
 	
 
 }
 
+// /**
+// * Ensures that this collection contains the specified element (optional
+// * operation).
+// *
+// * @param element
+// * whose presence in this collection is to be ensured.
+// * @see java.util.Collection#add(Object)
+// *
+// */
+// public boolean addCarte(Carte carte) {
+// return this.carte.add(carte);
+// }
+// /**
+// * Setter of the property <tt>carte</tt>
+// *
+// * @param carte
+// * the carte to set.
+// *
+// */
+// public void setCarte(Collection<Carte> carte) {
+// this.carte = carte;
+// }
+// /**
+// * Removes a single instance of the specified element from this
+// * collection, if it is present (optional operation).
+// *
+// * @param element
+// * to be removed from this collection, if present.
+// * @see java.util.Collection#add(Object)
+// *
+// */
+// public boolean removeCarte(Carte carte) {
+// return this.carte.remove(carte);
+// }
+// /**
+// * Getter of the property <tt>carte</tt>
+// *
+// * @return Returns the carte.
+// *
+// */
+//
+// public Collection<Carte> getCarte() {
+// return carte;
+// }
+// /**
+// * Returns the number of elements in this collection.
+// *
+// * @return the number of elements in this collection
+// * @see java.util.Collection#size()
+// *
+// */
+// public int carteSize() {
+// return carte.size();
+// }
+// /**
+// * Setter of the property <tt>partie</tt>
+// *
+// * @param partie
+// * The partie to set.
+// *
+// */
+// public void setPartie(Partie partie) {
+// this.partie = partie;
+// }
+// /**
+// * Getter of the property <tt>partie</tt>
+// *
+// * @return Returns the partie.
+// *
+// */
+//
+// public Partie getPartie() {
+// return partie;
+// }
